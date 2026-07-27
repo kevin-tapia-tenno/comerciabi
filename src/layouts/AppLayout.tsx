@@ -45,6 +45,18 @@ const menuItems: MenuItem[] = [
     roles: ['ADMIN', 'GERENTE', 'ALMACEN'],
   },
   {
+    label: 'Proveedores',
+    path: '/proveedores',
+    short: 'PV',
+    roles: ['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA'],
+  },
+  {
+    label: 'Compras',
+    path: '/compras',
+    short: 'CP',
+    roles: ['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA'],
+  },
+  {
     label: 'Cargas de archivos',
     path: '/cargas',
     short: 'CA',
@@ -70,6 +82,8 @@ const pageTitles: Record<string, string> = {
   '/productos': 'Productos',
   '/ventas': 'Ventas',
   '/inventario': 'Inventario',
+  '/proveedores': 'Proveedores',
+  '/compras': 'Compras',
   '/cargas': 'Cargas de archivos',
   '/reportes': 'Reportes',
   '/usuarios': 'Usuarios y roles',

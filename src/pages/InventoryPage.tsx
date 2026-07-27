@@ -216,7 +216,7 @@ export function InventoryPage() {
     let query = supabase
       .from('movimientos_inventario')
       .select(
-        'id, empresa_id, almacen_id, producto_id, venta_id, usuario_empresa_id, tipo_movimiento, cantidad, stock_anterior, stock_resultante, motivo, fecha_movimiento, creado_at',
+        'id, empresa_id, almacen_id, producto_id, venta_id, compra_id, usuario_empresa_id, tipo_movimiento, cantidad, stock_anterior, stock_resultante, motivo, fecha_movimiento, creado_at',
         { count: 'exact' },
       )
       .eq('empresa_id', company.id)
@@ -980,7 +980,7 @@ export function InventoryPage() {
                           <td>{formatQuantity(Number(movement.cantidad))}</td>
                           <td>{formatQuantity(Number(movement.stock_anterior))}</td>
                           <td>{formatQuantity(Number(movement.stock_resultante))}</td>
-                          <td>{movement.venta_id ? 'Venta' : 'Manual'}</td>
+                          <td>{movement.venta_id ? 'Venta' : movement.compra_id ? 'Compra' : 'Manual'}</td>
                           <td className="reason-cell">{movement.motivo}</td>
                         </tr>
                       )

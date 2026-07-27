@@ -14,6 +14,9 @@ interface DashboardCounts {
   stockCritico: number
   productosAgotados: number
   valorInventario: number
+  proveedores: number
+  compras: number
+  comprasConfirmadas: number
 }
 
 interface QuickLink {
@@ -33,6 +36,9 @@ const initialCounts: DashboardCounts = {
   stockCritico: 0,
   productosAgotados: 0,
   valorInventario: 0,
+  proveedores: 0,
+  compras: 0,
+  comprasConfirmadas: 0,
 }
 
 const quickLinks: QuickLink[] = [
@@ -60,6 +66,18 @@ const quickLinks: QuickLink[] = [
     description: 'Existencias, entradas, ajustes y Kardex.',
     roles: ['ADMIN', 'GERENTE', 'ALMACEN'],
   },
+  {
+    path: '/proveedores',
+    title: 'Proveedores',
+    description: 'Directorio de abastecimiento y contactos comerciales.',
+    roles: ['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA'],
+  },
+  {
+    path: '/compras',
+    title: 'Compras',
+    description: 'Borradores, recepciones y control de compras.',
+    roles: ['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA'],
+  },
 ]
 
 export function DashboardPage() {
@@ -83,6 +101,9 @@ export function DashboardPage() {
         salesResult,
         confirmedSalesResult,
         inventoryResult,
+        suppliersResult,
+        purchasesResult,
+        confirmedPurchasesResult,
       ] = await Promise.all([
         supabase
           .from('productos')
@@ -106,6 +127,16 @@ export function DashboardPage() {
         supabase
           .from('existencias_producto')
           .select('producto_id, stock_actual, stock_minimo'),
+        supabase
+          .from('proveedores')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('compras')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('compras')
+          .select('total')
+          .eq('estado', 'CONFIRMADA'),
       ])
 
       if (!active) return
@@ -118,6 +149,9 @@ export function DashboardPage() {
         salesResult.error,
         confirmedSalesResult.error,
         inventoryResult.error,
+        suppliersResult.error,
+        purchasesResult.error,
+        confirmedPurchasesResult.error,
       ].find(Boolean)
 
       if (firstError) {
@@ -174,6 +208,11 @@ export function DashboardPage() {
               * Number(costsMap.get(item.producto_id) ?? 0),
           0,
         ),
+        proveedores: suppliersResult.count ?? 0,
+        compras: purchasesResult.count ?? 0,
+        comprasConfirmadas: (
+          (confirmedPurchasesResult.data ?? []) as Array<{ total: number }>
+        ).reduce((sum, purchase) => sum + Number(purchase.total), 0),
       })
       setLoadingCounts(false)
     }
@@ -276,6 +315,29 @@ export function DashboardPage() {
                 }).format(counts.valorInventario)}
           </strong>
           <small>Stock valorizado al costo</small>
+        </article>
+        <article className="metric-card">
+          <span>Proveedores</span>
+          <strong>{loadingCounts ? '...' : counts.proveedores}</strong>
+          <small>Directorio de abastecimiento</small>
+        </article>
+        <article className="metric-card">
+          <span>Compras</span>
+          <strong>{loadingCounts ? '...' : counts.compras}</strong>
+          <small>Operaciones registradas</small>
+        </article>
+        <article className="metric-card">
+          <span>Compras confirmadas</span>
+          <strong>
+            {loadingCounts
+              ? '...'
+              : new Intl.NumberFormat('es-PE', {
+                  style: 'currency',
+                  currency: company?.moneda ?? 'PEN',
+                  maximumFractionDigits: 0,
+                }).format(counts.comprasConfirmadas)}
+          </strong>
+          <small>Recepciones vigentes</small>
         </article>
       </section>
 

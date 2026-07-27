@@ -1858,3 +1858,81 @@ p {
     grid-column: auto;
   }
 }
+
+/* Phase 9: suppliers and purchases */
+.supplier-toolbar {
+  grid-template-columns: minmax(280px, 1fr) minmax(180px, 260px);
+}
+
+.purchases-toolbar {
+  grid-template-columns: minmax(260px, 1.25fr) repeat(4, minmax(150px, 0.75fr));
+}
+
+.suppliers-table {
+  min-width: 980px;
+}
+
+.purchases-table {
+  min-width: 1180px;
+}
+
+.purchase-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.purchase-status-borrador {
+  background: #fff7e6;
+  color: #b54708;
+}
+
+.purchase-status-confirmada {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.purchase-status-anulada {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.movement-type-reversa_compra {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.button-danger {
+  border-color: #b42318;
+  background: #b42318;
+  color: #ffffff;
+}
+
+.button-danger:hover:not(:disabled) {
+  background: #912018;
+}
+
+@media (max-width: 1180px) {
+  .purchases-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .purchases-toolbar .search-control {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .supplier-toolbar,
+  .purchases-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .purchases-toolbar .search-control {
+    grid-column: auto;
+  }
+}

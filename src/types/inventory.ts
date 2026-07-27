@@ -4,6 +4,7 @@ export type InventoryMovementType =
   | 'AJUSTE_POSITIVO'
   | 'AJUSTE_NEGATIVO'
   | 'REVERSA'
+  | 'REVERSA_COMPRA'
 
 export type ManualInventoryMovementType =
   | 'ENTRADA'
@@ -27,6 +28,7 @@ export interface InventoryMovement {
   almacen_id: string
   producto_id: string
   venta_id: string | null
+  compra_id: string | null
   usuario_empresa_id: string
   tipo_movimiento: InventoryMovementType
   cantidad: number
@@ -58,6 +60,7 @@ export const inventoryMovementLabels: Record<InventoryMovementType, string> = {
   AJUSTE_POSITIVO: 'Ajuste positivo',
   AJUSTE_NEGATIVO: 'Ajuste negativo',
   REVERSA: 'Reversa de venta',
+  REVERSA_COMPRA: 'Reversa de compra',
 }
 
 export const inventoryStockStatusLabels: Record<InventoryStockStatus, string> = {

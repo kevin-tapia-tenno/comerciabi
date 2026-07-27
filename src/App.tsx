@@ -13,6 +13,8 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { PurchasesPage } from './pages/PurchasesPage'
+import { SuppliersPage } from './pages/SuppliersPage'
 import { SalesPage } from './pages/SalesPage'
 
 function AuthenticatedApplication() {
@@ -86,6 +88,29 @@ export default function App() {
           element={
             <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN']}>
               <InventoryPage />
+            </RoleRoute>
+          }
+        />
+
+
+        <Route
+          path="proveedores"
+          element={
+            <RoleRoute
+              allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA']}
+            >
+              <SuppliersPage />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="compras"
+          element={
+            <RoleRoute
+              allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA']}
+            >
+              <PurchasesPage />
             </RoleRoute>
           }
         />
