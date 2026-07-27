@@ -9,6 +9,7 @@ import { AccountContextErrorPage } from './pages/AccountContextErrorPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { InventoryPage } from './pages/InventoryPage'
+import ImportsPage from './pages/ImportsPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
@@ -119,11 +120,7 @@ export default function App() {
           path="cargas"
           element={
             <RoleRoute allowedRoles={['ADMIN', 'ANALISTA']}>
-              <PlaceholderPage
-                title="Cargas de archivos"
-                description="Importación y validación de Excel y CSV."
-                phase="Fase 10"
-              />
+              <ImportsPage />
             </RoleRoute>
           }
         />
