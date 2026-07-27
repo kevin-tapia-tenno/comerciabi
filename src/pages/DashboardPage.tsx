@@ -9,6 +9,8 @@ interface DashboardCounts {
   clientes: number
   categorias: number
   almacenes: number
+  ventas: number
+  ventasConfirmadas: number
 }
 
 interface QuickLink {
@@ -23,6 +25,8 @@ const initialCounts: DashboardCounts = {
   clientes: 0,
   categorias: 0,
   almacenes: 0,
+  ventas: 0,
+  ventasConfirmadas: 0,
 }
 
 const quickLinks: QuickLink[] = [
@@ -41,7 +45,7 @@ const quickLinks: QuickLink[] = [
   {
     path: '/ventas',
     title: 'Ventas',
-    description: 'Registro transaccional de la Fase 7.',
+    description: 'Registro, confirmación y anulación de operaciones.',
     roles: ['ADMIN', 'GERENTE', 'VENDEDOR'],
   },
   {
@@ -70,6 +74,8 @@ export function DashboardPage() {
         clientsResult,
         categoriesResult,
         warehousesResult,
+        salesResult,
+        confirmedSalesResult,
       ] = await Promise.all([
         supabase
           .from('productos')
@@ -83,6 +89,13 @@ export function DashboardPage() {
         supabase
           .from('almacenes')
           .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('ventas')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('ventas')
+          .select('total')
+          .eq('estado', 'CONFIRMADA'),
       ])
 
       if (!active) return
@@ -92,6 +105,8 @@ export function DashboardPage() {
         clientsResult.error,
         categoriesResult.error,
         warehousesResult.error,
+        salesResult.error,
+        confirmedSalesResult.error,
       ].find(Boolean)
 
       if (firstError) {
@@ -105,6 +120,10 @@ export function DashboardPage() {
         clientes: clientsResult.count ?? 0,
         categorias: categoriesResult.count ?? 0,
         almacenes: warehousesResult.count ?? 0,
+        ventas: salesResult.count ?? 0,
+        ventasConfirmadas: (
+          (confirmedSalesResult.data ?? []) as Array<{ total: number }>
+        ).reduce((sum, sale) => sum + Number(sale.total), 0),
       })
       setLoadingCounts(false)
     }
@@ -166,6 +185,24 @@ export function DashboardPage() {
           <span>Almacenes</span>
           <strong>{loadingCounts ? '...' : counts.almacenes}</strong>
           <small>Ubicaciones operativas</small>
+        </article>
+        <article className="metric-card">
+          <span>Ventas</span>
+          <strong>{loadingCounts ? '...' : counts.ventas}</strong>
+          <small>Operaciones registradas</small>
+        </article>
+        <article className="metric-card">
+          <span>Facturación confirmada</span>
+          <strong>
+            {loadingCounts
+              ? '...'
+              : new Intl.NumberFormat('es-PE', {
+                  style: 'currency',
+                  currency: company?.moneda ?? 'PEN',
+                  maximumFractionDigits: 0,
+                }).format(counts.ventasConfirmadas)}
+          </strong>
+          <small>Sin considerar ventas anuladas</small>
         </article>
       </section>
 

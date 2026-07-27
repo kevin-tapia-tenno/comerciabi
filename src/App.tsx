@@ -12,6 +12,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { SalesPage } from './pages/SalesPage'
 
 function AuthenticatedApplication() {
   const { contextError, profile, membership, company } = useAuth()
@@ -74,11 +75,7 @@ export default function App() {
           path="ventas"
           element={
             <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'VENDEDOR']}>
-              <PlaceholderPage
-                title="Ventas"
-                description="Registro de ventas y detalle de productos."
-                phase="Fase 7"
-              />
+              <SalesPage />
             </RoleRoute>
           }
         />
