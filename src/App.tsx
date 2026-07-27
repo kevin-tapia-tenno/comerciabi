@@ -6,10 +6,12 @@ import { useAuth } from './hooks/useAuth'
 import { AppLayout } from './layouts/AppLayout'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AccountContextErrorPage } from './pages/AccountContextErrorPage'
+import { ClientsPage } from './pages/ClientsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { ProductsPage } from './pages/ProductsPage'
 
 function AuthenticatedApplication() {
   const { contextError, profile, membership, company } = useAuth()
@@ -46,11 +48,7 @@ export default function App() {
           path="clientes"
           element={
             <RoleRoute allowedRoles={['ADMIN', 'VENDEDOR', 'ANALISTA']}>
-              <PlaceholderPage
-                title="Clientes"
-                description="Registro, consulta y actualización de clientes."
-                phase="Fase 6"
-              />
+              <ClientsPage />
             </RoleRoute>
           }
         />
@@ -67,11 +65,7 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <PlaceholderPage
-                title="Productos"
-                description="Catálogo, categorías, precios y costos."
-                phase="Fase 6"
-              />
+              <ProductsPage />
             </RoleRoute>
           }
         />

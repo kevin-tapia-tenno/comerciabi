@@ -1,14 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
-import { roleLabels } from '../types/auth'
+import { roleLabels, type UserRole } from '../types/auth'
 
 interface DashboardCounts {
   productos: number
   clientes: number
   categorias: number
   almacenes: number
+}
+
+interface QuickLink {
+  path: string
+  title: string
+  description: string
+  roles: UserRole[]
 }
 
 const initialCounts: DashboardCounts = {
@@ -18,10 +25,36 @@ const initialCounts: DashboardCounts = {
   almacenes: 0,
 }
 
+const quickLinks: QuickLink[] = [
+  {
+    path: '/clientes',
+    title: 'Clientes',
+    description: 'Registro y administración del directorio comercial.',
+    roles: ['ADMIN', 'VENDEDOR', 'ANALISTA'],
+  },
+  {
+    path: '/productos',
+    title: 'Productos',
+    description: 'Consulta del catálogo y categorías empresariales.',
+    roles: ['ADMIN', 'GERENTE', 'VENDEDOR', 'ALMACEN', 'ANALISTA'],
+  },
+  {
+    path: '/ventas',
+    title: 'Ventas',
+    description: 'Registro transaccional de la Fase 7.',
+    roles: ['ADMIN', 'GERENTE', 'VENDEDOR'],
+  },
+  {
+    path: '/inventario',
+    title: 'Inventario',
+    description: 'Control de stock de la Fase 8.',
+    roles: ['ADMIN', 'GERENTE', 'ALMACEN'],
+  },
+]
+
 export function DashboardPage() {
   const { user, profile, membership, company } = useAuth()
-  const [counts, setCounts] =
-    useState<DashboardCounts>(initialCounts)
+  const [counts, setCounts] = useState<DashboardCounts>(initialCounts)
   const [loadingCounts, setLoadingCounts] = useState(true)
   const [dataError, setDataError] = useState<string | null>(null)
 
@@ -87,6 +120,11 @@ export function DashboardPage() {
     ? `${profile.nombres} ${profile.apellidos}`.trim()
     : user?.email
 
+  const visibleQuickLinks = useMemo(() => {
+    if (!membership) return []
+    return quickLinks.filter((link) => link.roles.includes(membership.rol))
+  }, [membership])
+
   return (
     <div className="page-stack">
       <section className="welcome-panel">
@@ -94,8 +132,8 @@ export function DashboardPage() {
           <span className="eyebrow">Sesión autenticada</span>
           <h2>Bienvenido, {displayName}</h2>
           <p>
-            La aplicación ya está conectada con Supabase y está
-            consultando información protegida mediante RLS.
+            La aplicación está conectada con Supabase y consulta información
+            protegida mediante RLS.
           </p>
         </div>
         <span className="status-pill">Conexión activa</span>
@@ -152,9 +190,7 @@ export function DashboardPage() {
             <div>
               <dt>Rol</dt>
               <dd>
-                {membership
-                  ? roleLabels[membership.rol]
-                  : 'No disponible'}
+                {membership ? roleLabels[membership.rol] : 'No disponible'}
               </dd>
             </div>
             <div>
@@ -171,28 +207,18 @@ export function DashboardPage() {
         <article className="panel">
           <div className="panel-heading">
             <div>
-              <span className="eyebrow">Próximos módulos</span>
+              <span className="eyebrow">Módulos disponibles</span>
               <h3>Accesos rápidos</h3>
             </div>
           </div>
 
           <div className="quick-link-grid">
-            <Link to="/clientes" className="quick-link">
-              <strong>Clientes</strong>
-              <span>Preparado para el CRUD de la Fase 6.</span>
-            </Link>
-            <Link to="/productos" className="quick-link">
-              <strong>Productos</strong>
-              <span>Consulta del catálogo empresarial.</span>
-            </Link>
-            <Link to="/ventas" className="quick-link">
-              <strong>Ventas</strong>
-              <span>Registro transaccional de la Fase 7.</span>
-            </Link>
-            <Link to="/inventario" className="quick-link">
-              <strong>Inventario</strong>
-              <span>Control de stock de la Fase 8.</span>
-            </Link>
+            {visibleQuickLinks.map((link) => (
+              <Link key={link.path} to={link.path} className="quick-link">
+                <strong>{link.title}</strong>
+                <span>{link.description}</span>
+              </Link>
+            ))}
           </div>
         </article>
       </section>
