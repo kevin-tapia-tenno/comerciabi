@@ -1635,3 +1635,226 @@ p {
     width: 100%;
   }
 }
+
+/* Phase 8: inventory and Kardex */
+
+.metric-card-warning {
+  border-color: #fedf89;
+  background: #fffcf5;
+}
+
+.metric-card-danger {
+  border-color: #fecdca;
+  background: #fffafa;
+}
+
+.inventory-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin: 22px 0;
+}
+
+.inventory-metric-grid .metric-card {
+  min-height: 132px;
+  padding: 18px;
+}
+
+.inventory-metric-grid .metric-card strong {
+  font-size: 1.85rem;
+}
+
+.inventory-toolbar,
+.kardex-toolbar {
+  display: grid;
+  gap: 12px;
+  margin: 4px 0 24px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--surface-soft);
+}
+
+.inventory-toolbar {
+  grid-template-columns: minmax(260px, 1.45fr) repeat(3, minmax(150px, 0.7fr));
+}
+
+.kardex-toolbar {
+  grid-template-columns: minmax(150px, 0.7fr) minmax(260px, 1.3fr) minmax(180px, 0.85fr) repeat(2, minmax(145px, 0.65fr));
+}
+
+.inventory-toolbar input,
+.inventory-toolbar select,
+.kardex-toolbar input,
+.kardex-toolbar select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: #ffffff;
+  color: var(--navy);
+}
+
+.inventory-toolbar input:focus,
+.inventory-toolbar select:focus,
+.kardex-toolbar input:focus,
+.kardex-toolbar select:focus {
+  border-color: var(--primary);
+  outline: 3px solid rgba(23, 107, 91, 0.12);
+}
+
+.inventory-table {
+  min-width: 1280px;
+}
+
+.kardex-table {
+  min-width: 1380px;
+}
+
+.inventory-table td small,
+.kardex-table td small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.quantity-cell {
+  font-weight: 800;
+}
+
+.inventory-status,
+.movement-type {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.inventory-status-normal {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.inventory-status-critico {
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.inventory-status-agotado {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.movement-type-entrada,
+.movement-type-ajuste_positivo,
+.movement-type-reversa {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.movement-type-salida,
+.movement-type-ajuste_negativo {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.reason-cell {
+  min-width: 280px;
+  max-width: 420px;
+  white-space: normal;
+}
+
+.inventory-form-alert {
+  margin-bottom: 18px;
+}
+
+.movement-preview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.movement-preview > div {
+  display: flex;
+  min-height: 92px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--surface-soft);
+}
+
+.movement-preview span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.movement-preview strong {
+  color: var(--navy);
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+@media (max-width: 1320px) {
+  .inventory-metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .kardex-toolbar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .kardex-product-filter {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 1040px) {
+  .inventory-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inventory-toolbar .search-control {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .inventory-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kardex-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kardex-product-filter {
+    grid-column: 1 / -1;
+  }
+
+  .movement-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .inventory-metric-grid,
+  .inventory-toolbar,
+  .kardex-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-toolbar .search-control,
+  .kardex-product-filter {
+    grid-column: auto;
+  }
+}

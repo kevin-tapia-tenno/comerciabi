@@ -11,6 +11,9 @@ interface DashboardCounts {
   almacenes: number
   ventas: number
   ventasConfirmadas: number
+  stockCritico: number
+  productosAgotados: number
+  valorInventario: number
 }
 
 interface QuickLink {
@@ -27,6 +30,9 @@ const initialCounts: DashboardCounts = {
   almacenes: 0,
   ventas: 0,
   ventasConfirmadas: 0,
+  stockCritico: 0,
+  productosAgotados: 0,
+  valorInventario: 0,
 }
 
 const quickLinks: QuickLink[] = [
@@ -51,7 +57,7 @@ const quickLinks: QuickLink[] = [
   {
     path: '/inventario',
     title: 'Inventario',
-    description: 'Control de stock de la Fase 8.',
+    description: 'Existencias, entradas, ajustes y Kardex.',
     roles: ['ADMIN', 'GERENTE', 'ALMACEN'],
   },
 ]
@@ -76,6 +82,7 @@ export function DashboardPage() {
         warehousesResult,
         salesResult,
         confirmedSalesResult,
+        inventoryResult,
       ] = await Promise.all([
         supabase
           .from('productos')
@@ -96,6 +103,9 @@ export function DashboardPage() {
           .from('ventas')
           .select('total')
           .eq('estado', 'CONFIRMADA'),
+        supabase
+          .from('existencias_producto')
+          .select('producto_id, stock_actual, stock_minimo'),
       ])
 
       if (!active) return
@@ -107,6 +117,7 @@ export function DashboardPage() {
         warehousesResult.error,
         salesResult.error,
         confirmedSalesResult.error,
+        inventoryResult.error,
       ].find(Boolean)
 
       if (firstError) {
@@ -114,6 +125,31 @@ export function DashboardPage() {
         setLoadingCounts(false)
         return
       }
+
+      const inventoryRows = (inventoryResult.data ?? []) as Array<{
+        producto_id: string
+        stock_actual: number
+        stock_minimo: number
+      }>
+
+      const productCostsResult = await supabase
+        .from('productos')
+        .select('id, costo_actual')
+
+      if (!active) return
+
+      if (productCostsResult.error) {
+        setDataError(productCostsResult.error.message)
+        setLoadingCounts(false)
+        return
+      }
+
+      const costsMap = new Map(
+        ((productCostsResult.data ?? []) as Array<{
+          id: string
+          costo_actual: number
+        }>).map((product) => [product.id, Number(product.costo_actual)]),
+      )
 
       setCounts({
         productos: productsResult.count ?? 0,
@@ -124,6 +160,20 @@ export function DashboardPage() {
         ventasConfirmadas: (
           (confirmedSalesResult.data ?? []) as Array<{ total: number }>
         ).reduce((sum, sale) => sum + Number(sale.total), 0),
+        stockCritico: inventoryRows.filter(
+          (item) => Number(item.stock_minimo) > 0
+            && Number(item.stock_actual) > 0
+            && Number(item.stock_actual) <= Number(item.stock_minimo),
+        ).length,
+        productosAgotados: inventoryRows.filter(
+          (item) => Number(item.stock_actual) <= 0,
+        ).length,
+        valorInventario: inventoryRows.reduce(
+          (sum, item) => sum
+            + Number(item.stock_actual)
+              * Number(costsMap.get(item.producto_id) ?? 0),
+          0,
+        ),
       })
       setLoadingCounts(false)
     }
@@ -203,6 +253,29 @@ export function DashboardPage() {
                 }).format(counts.ventasConfirmadas)}
           </strong>
           <small>Sin considerar ventas anuladas</small>
+        </article>
+        <article className="metric-card metric-card-warning">
+          <span>Stock crítico</span>
+          <strong>{loadingCounts ? '...' : counts.stockCritico}</strong>
+          <small>Requieren reposición</small>
+        </article>
+        <article className="metric-card metric-card-danger">
+          <span>Productos agotados</span>
+          <strong>{loadingCounts ? '...' : counts.productosAgotados}</strong>
+          <small>Stock actual en cero</small>
+        </article>
+        <article className="metric-card">
+          <span>Valor del inventario</span>
+          <strong>
+            {loadingCounts
+              ? '...'
+              : new Intl.NumberFormat('es-PE', {
+                  style: 'currency',
+                  currency: company?.moneda ?? 'PEN',
+                  maximumFractionDigits: 0,
+                }).format(counts.valorInventario)}
+          </strong>
+          <small>Stock valorizado al costo</small>
         </article>
       </section>
 

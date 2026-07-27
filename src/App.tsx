@@ -8,6 +8,7 @@ import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AccountContextErrorPage } from './pages/AccountContextErrorPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { InventoryPage } from './pages/InventoryPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
@@ -84,11 +85,7 @@ export default function App() {
           path="inventario"
           element={
             <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN']}>
-              <PlaceholderPage
-                title="Inventario"
-                description="Existencias, entradas, ajustes y movimientos."
-                phase="Fase 8"
-              />
+              <InventoryPage />
             </RoleRoute>
           }
         />
