@@ -14,6 +14,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { ReportsPage } from './pages/ReportsPage'
 import { PurchasesPage } from './pages/PurchasesPage'
 import { SuppliersPage } from './pages/SuppliersPage'
 import { SalesPage } from './pages/SalesPage'
@@ -129,11 +130,7 @@ export default function App() {
           path="reportes"
           element={
             <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'ANALISTA']}>
-              <PlaceholderPage
-                title="Reportes"
-                description="Indicadores, análisis gerencial y Power BI."
-                phase="Fases 11 a 13"
-              />
+              <ReportsPage />
             </RoleRoute>
           }
         />
