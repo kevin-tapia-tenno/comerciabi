@@ -1,0 +1,14 @@
+# Entorno virtual local
+.venv/
+
+# Credenciales locales
+.env
+
+# Salidas del ETL
+output/*.csv
+output/*.xlsx
+output/*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
