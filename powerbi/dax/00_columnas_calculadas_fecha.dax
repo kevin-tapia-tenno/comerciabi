@@ -1,0 +1,51 @@
+-- ComercioBI - Fase 13
+-- Columnas calculadas para la tabla Fecha.
+--
+-- IMPORTANTE:
+-- Crea cada columna por separado en:
+--   Modelado -> Nueva columna
+--
+-- Después:
+--   1) selecciona Fecha[Mes Nombre Corto]
+--      -> Ordenar por columna -> Fecha[mes]
+--   2) selecciona Fecha[Año Mes]
+--      -> Ordenar por columna -> Fecha[Año Mes Orden]
+--   3) marca Fecha como tabla de fechas usando Fecha[fecha].
+
+-- ================================================================
+-- COLUMNA 1
+-- ================================================================
+
+Mes Nombre Corto =
+FORMAT ( Fecha[fecha], "mmm" )
+
+-- ================================================================
+-- COLUMNA 2
+-- ================================================================
+
+Año Mes =
+FORMAT ( Fecha[fecha], "yyyy-MM" )
+
+-- ================================================================
+-- COLUMNA 3
+-- ================================================================
+
+Año Mes Orden =
+YEAR ( Fecha[fecha] ) * 100
+    + MONTH ( Fecha[fecha] )
+
+-- ================================================================
+-- COLUMNA 4
+-- ================================================================
+
+Trimestre Texto =
+"T" & FORMAT ( Fecha[trimestre], "0" )
+
+-- ================================================================
+-- COLUMNA 5
+-- ================================================================
+
+Año Trimestre =
+FORMAT ( Fecha[anio], "0" )
+    & "-T"
+    & FORMAT ( Fecha[trimestre], "0" )

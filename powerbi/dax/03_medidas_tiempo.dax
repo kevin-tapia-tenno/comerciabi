@@ -1,0 +1,72 @@
+-- ComercioBI - Fase 13
+-- Medidas de inteligencia de tiempo.
+--
+-- Requisito:
+--   Fecha debe estar marcada como tabla de fechas usando Fecha[fecha].
+
+Facturación YTD =
+TOTALYTD (
+    [Facturación],
+    Fecha[fecha]
+)
+
+Utilidad Bruta YTD =
+TOTALYTD (
+    [Utilidad Bruta],
+    Fecha[fecha]
+)
+
+Facturación Mes Anterior =
+CALCULATE (
+    [Facturación],
+    DATEADD (
+        Fecha[fecha],
+        -1,
+        MONTH
+    )
+)
+
+Variación Mensual Facturación =
+[Facturación]
+    - [Facturación Mes Anterior]
+
+Variación Mensual Facturación % =
+DIVIDE (
+    [Variación Mensual Facturación],
+    [Facturación Mes Anterior],
+    0
+)
+
+Facturación Año Anterior =
+CALCULATE (
+    [Facturación],
+    SAMEPERIODLASTYEAR ( Fecha[fecha] )
+)
+
+Variación Anual Facturación =
+[Facturación]
+    - [Facturación Año Anterior]
+
+Variación Anual Facturación % =
+DIVIDE (
+    [Variación Anual Facturación],
+    [Facturación Año Anterior],
+    0
+)
+
+Utilidad Bruta Mes Anterior =
+CALCULATE (
+    [Utilidad Bruta],
+    DATEADD (
+        Fecha[fecha],
+        -1,
+        MONTH
+    )
+)
+
+Variación Mensual Utilidad % =
+DIVIDE (
+    [Utilidad Bruta] - [Utilidad Bruta Mes Anterior],
+    [Utilidad Bruta Mes Anterior],
+    0
+)

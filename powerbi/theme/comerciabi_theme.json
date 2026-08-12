@@ -1,0 +1,76 @@
+{
+  "name": "ComercioBI",
+  "dataColors": [
+    "#177565",
+    "#2F9A87",
+    "#4F6B8A",
+    "#D4A72C",
+    "#C45B4A",
+    "#7B61A8",
+    "#5F8D4E",
+    "#7A8798"
+  ],
+  "background": "#F3F6FA",
+  "foreground": "#152238",
+  "tableAccent": "#177565",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontFamily": "Segoe UI",
+            "fontSize": 12,
+            "fontColor": {
+              "solid": {
+                "color": "#152238"
+              }
+            }
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F3F6FA"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  },
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#152238"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#5B6B82"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 24,
+      "color": "#152238"
+    }
+  }
+}

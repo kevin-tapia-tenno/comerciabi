@@ -1,0 +1,45 @@
+ComercioBI - Modelo semántico Power BI
+=======================================
+
+TODAS las relaciones deben ser:
+- Cardinalidad: Uno a varios (1:*)
+- Dirección de filtro cruzado: Única
+- Activas: Sí
+- La dimensión filtra al hecho.
+
+RELACIONES DE VENTAS
+--------------------
+Fecha[fecha_key]       1 -> * Ventas[fecha_key]
+Empresa[empresa_key]   1 -> * Ventas[empresa_key]
+Cliente[cliente_key]   1 -> * Ventas[cliente_key]
+Producto[producto_key] 1 -> * Ventas[producto_key]
+Vendedor[vendedor_key] 1 -> * Ventas[vendedor_key]
+Canal[canal_key]       1 -> * Ventas[canal_key]
+
+RELACIONES DE INVENTARIO
+------------------------
+Fecha[fecha_key]       1 -> * Inventario[fecha_key]
+Empresa[empresa_key]   1 -> * Inventario[empresa_key]
+Producto[producto_key] 1 -> * Inventario[producto_key]
+Almacen[almacen_key]   1 -> * Inventario[almacen_key]
+
+NO crear:
+- relaciones entre las dos tablas de hechos;
+- relaciones bidireccionales;
+- relaciones dimensión-dimensión;
+- relaciones automáticas adicionales.
+
+DISTRIBUCIÓN SUGERIDA EN VISTA MODELO
+-------------------------------------
+                     Fecha
+                       |
+Cliente --\            |             /-- Vendedor
+Producto ---\        Ventas --------/--- Canal
+Empresa -----/          |
+                       |
+                    (sin unión)
+                       |
+                   Inventario
+                  /    |                  Producto Empresa Almacen
+                       |
+                     Fecha

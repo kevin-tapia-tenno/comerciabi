@@ -1,0 +1,96 @@
+-- ComercioBI - Fase 13
+-- Medidas comerciales.
+--
+-- Crea primero la tabla de medidas:
+--
+-- _Medidas =
+-- DATATABLE ( "Contenedor", STRING, { { "Medidas ComercioBI" } } )
+--
+-- Luego crea CADA medida siguiente por separado dentro de _Medidas.
+-- Puedes ocultar la columna _Medidas[Contenedor].
+
+-- ================================================================
+-- FACTURACIÓN Y RENTABILIDAD
+-- ================================================================
+
+Facturación =
+SUM ( Ventas[facturacion] )
+
+Venta Neta =
+SUM ( Ventas[venta_neta] )
+
+Impuesto =
+SUM ( Ventas[impuesto_asignado] )
+
+Costo de Ventas =
+SUM ( Ventas[costo_total] )
+
+Utilidad Bruta =
+SUM ( Ventas[utilidad_bruta] )
+
+Margen Bruto % =
+DIVIDE ( [Utilidad Bruta], [Venta Neta], 0 )
+
+Descuento Total =
+SUMX (
+    Ventas,
+    Ventas[descuento_linea]
+        + Ventas[descuento_cabecera_asignado]
+)
+
+-- ================================================================
+-- VOLUMEN COMERCIAL
+-- ================================================================
+
+Ventas Confirmadas =
+DISTINCTCOUNT ( Ventas[source_venta_id] )
+
+Unidades Vendidas =
+SUM ( Ventas[cantidad] )
+
+Clientes Compradores =
+CALCULATE (
+    DISTINCTCOUNT ( Ventas[cliente_key] ),
+    FILTER (
+        Ventas,
+        NOT ISBLANK ( Ventas[cliente_key] )
+    )
+)
+
+Productos Vendidos =
+DISTINCTCOUNT ( Ventas[producto_key] )
+
+Ticket Promedio =
+DIVIDE ( [Facturación], [Ventas Confirmadas], 0 )
+
+Venta Neta por Unidad =
+DIVIDE ( [Venta Neta], [Unidades Vendidas], 0 )
+
+Utilidad por Unidad =
+DIVIDE ( [Utilidad Bruta], [Unidades Vendidas], 0 )
+
+-- ================================================================
+-- MEDIDAS PARA TABLAS / DRILL-THROUGH
+-- ================================================================
+
+Código Venta Seleccionado =
+SELECTEDVALUE ( Ventas[codigo_venta], "—" )
+
+Cliente Seleccionado =
+SELECTEDVALUE ( Cliente[nombre_completo], "—" )
+
+Vendedor Seleccionado =
+SELECTEDVALUE ( Vendedor[nombre_completo], "—" )
+
+Canal Seleccionado =
+SELECTEDVALUE ( Canal[nombre], "—" )
+
+Fecha Venta Seleccionada =
+VAR FechaSeleccionada =
+    SELECTEDVALUE ( Fecha[fecha] )
+RETURN
+    IF (
+        ISBLANK ( FechaSeleccionada ),
+        "—",
+        FORMAT ( FechaSeleccionada, "dd/MM/yyyy" )
+    )

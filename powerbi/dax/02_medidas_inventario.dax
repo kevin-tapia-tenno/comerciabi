@@ -1,0 +1,156 @@
+-- ComercioBI - Fase 13
+-- Medidas de inventario.
+--
+-- El hecho de inventario conserva snapshots históricos.
+-- Por eso estas medidas siempre utilizan el ÚLTIMO snapshot disponible
+-- y eliminan cualquier filtro procedente de la dimensión Fecha.
+--
+-- Crea cada medida por separado dentro de _Medidas.
+
+Última Fecha Inventario =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+VAR Anio =
+    INT ( UltimaFechaKey / 10000 )
+VAR Mes =
+    INT ( MOD ( UltimaFechaKey, 10000 ) / 100 )
+VAR Dia =
+    MOD ( UltimaFechaKey, 100 )
+RETURN
+    IF (
+        ISBLANK ( UltimaFechaKey ),
+        BLANK (),
+        DATE ( Anio, Mes, Dia )
+    )
+
+Stock Último Snapshot =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        SUM ( Inventario[stock_actual] ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey
+    )
+
+Valor Inventario =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        SUM ( Inventario[valor_stock] ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey
+    )
+
+Posiciones Inventario =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        COUNTROWS ( Inventario ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey
+    )
+
+Posiciones Críticas =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        COUNTROWS ( Inventario ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey,
+        Inventario[es_critico] = TRUE ()
+    )
+
+Posiciones Agotadas =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        COUNTROWS ( Inventario ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey,
+        Inventario[es_agotado] = TRUE ()
+    )
+
+Valor Inventario Crítico =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        SUM ( Inventario[valor_stock] ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey,
+        Inventario[es_critico] = TRUE ()
+    )
+
+% Posiciones Críticas =
+DIVIDE (
+    [Posiciones Críticas],
+    [Posiciones Inventario],
+    0
+)
+
+Stock Mínimo Último Snapshot =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        SUM ( Inventario[stock_minimo] ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey
+    )
+
+Costo Unitario Último Snapshot =
+VAR UltimaFechaKey =
+    CALCULATE (
+        MAX ( Inventario[fecha_key] ),
+        REMOVEFILTERS ( Fecha )
+    )
+RETURN
+    CALCULATE (
+        MAX ( Inventario[costo_unitario] ),
+        REMOVEFILTERS ( Fecha ),
+        Inventario[fecha_key] = UltimaFechaKey
+    )
+
+Estado Inventario =
+VAR StockActual =
+    [Stock Último Snapshot]
+VAR StockMinimo =
+    [Stock Mínimo Último Snapshot]
+RETURN
+    SWITCH (
+        TRUE (),
+        ISBLANK ( StockActual ), "—",
+        StockActual <= 0, "Agotado",
+        StockMinimo > 0 && StockActual <= StockMinimo, "Crítico",
+        "Normal"
+    )
+
