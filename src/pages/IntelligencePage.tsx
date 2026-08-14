@@ -14,6 +14,7 @@ import {
 } from '../lib/ai-service'
 import { ApiClientError } from '../lib/api-client'
 import { SalesForecastSection } from '../components/ai/SalesForecastSection'
+import { DemandForecastSection } from '../components/ai/DemandForecastSection'
 
 import '../styles/intelligence.css'
 
@@ -292,7 +293,7 @@ export default function IntelligencePage() {
   const [
     loading,
     setLoading,
-  ] = useState(true)
+  ] = useState(false)
 
   const [
     error,
@@ -339,12 +340,6 @@ export default function IntelligencePage() {
 
   useEffect(() => {
     if (!aiService) {
-      setLoading(false)
-
-      setError(
-        'No existe una sesión empresarial disponible para consultar la IA.',
-      )
-
       return
     }
 
@@ -415,6 +410,17 @@ export default function IntelligencePage() {
     aiService,
     refreshVersion,
   ])
+
+
+  const contextError =
+    !accessToken ||
+    !empresaId
+      ? 'No existe una sesión empresarial disponible para consultar la IA.'
+      : null
+
+
+  const visibleError =
+    contextError ?? error
 
 
   const summary =
@@ -561,7 +567,7 @@ export default function IntelligencePage() {
           <span className="status-pill">
             {loading
               ? 'Consultando IA'
-              : error
+              : visibleError
                 ? 'Con observaciones'
                 : 'IA conectada'}
           </span>
@@ -585,7 +591,7 @@ export default function IntelligencePage() {
       </section>
 
 
-      {error ? (
+      {visibleError ? (
         <section className="alert alert-error">
           <strong>
             No se pudo consultar la capa
@@ -593,7 +599,7 @@ export default function IntelligencePage() {
           </strong>
 
           <span>
-            {error}
+            {visibleError}
           </span>
         </section>
       ) : null}
@@ -1036,6 +1042,19 @@ export default function IntelligencePage() {
             ?? []
         }
         currency={currency}
+        loading={
+          loading &&
+          !dashboard
+        }
+      />
+
+
+      <DemandForecastSection
+        demandForecast={
+          dashboard
+            ?.demand_forecast
+            ?? []
+        }
         loading={
           loading &&
           !dashboard
