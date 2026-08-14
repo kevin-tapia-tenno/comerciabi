@@ -638,6 +638,26 @@ def persist_forecasts() -> int:
         # ----------------------------------------------------
         # 2. Persistir pronósticos
         # ----------------------------------------------------
+        persisted_at_utc = datetime.now(timezone.utc).isoformat()
+
+        persistence_metadata = forecast_metadata.setdefault(
+            "persistence",
+            {},
+        )
+        persistence_metadata.update(
+            {
+                "postgresql_written": True,
+                "execution_id": execution_id,
+                "persisted_at_utc": persisted_at_utc,
+                "sales_rows": int(len(sales)),
+                "demand_rows": int(len(demand)),
+            }
+        )
+        persistence_metadata.pop("reason", None)
+
+        metadata["forecast"] = forecast_metadata
+        metadata["persisted_at_utc"] = persisted_at_utc
+
         with engine.begin() as conn:
             sales_rows: list[dict[str, Any]] = []
 
@@ -799,17 +819,37 @@ def persist_forecasts() -> int:
                     set
                         estado = 'COMPLETADA',
                         finalizado_en = now(),
+                        metadata = cast(:metadata as jsonb),
                         mensaje = :mensaje
                     where id = :execution_id
                     """
                 ),
                 {
                     "execution_id": execution_id,
+                    "metadata": json.dumps(
+                        metadata,
+                        ensure_ascii=False,
+                    ),
                     "mensaje": (
                         "Pronósticos de ventas y demanda "
                         "persistidos correctamente."
                     ),
                 },
+            )
+
+        try:
+            FORECAST_METADATA_PATH.write_text(
+                json.dumps(
+                    forecast_metadata,
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+        except OSError as exc:
+            print(
+                "ADVERTENCIA: PostgreSQL quedó persistido, pero no se pudo "
+                f"actualizar {FORECAST_METADATA_PATH}: {exc}"
             )
 
         print()
