@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "gru1"
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30,
+      "excludeFiles": "{etl/**,powerbi/**,database/**,docs/**,scripts/**,tests/**,node_modules/**,dist/**,public/**,src/**,**/__pycache__/**,**/*.pyc,**/*.md}"
+    }
+  }
+}
