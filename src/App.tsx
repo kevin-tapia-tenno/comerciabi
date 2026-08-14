@@ -1,4 +1,15 @@
-import { Navigate, Route, Routes } from 'react-router'
+import {
+  lazy,
+  Suspense,
+} from 'react'
+
+import {
+  Navigate,
+  Route,
+  Routes,
+} from 'react-router'
+
+import { LoadingScreen } from './components/LoadingScreen'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { PublicOnlyRoute } from './components/PublicOnlyRoute'
 import { RoleRoute } from './components/RoleRoute'
@@ -19,15 +30,32 @@ import { PurchasesPage } from './pages/PurchasesPage'
 import { SuppliersPage } from './pages/SuppliersPage'
 import { SalesPage } from './pages/SalesPage'
 
-function AuthenticatedApplication() {
-  const { contextError, profile, membership, company } = useAuth()
 
-  if (contextError || !profile || !membership || !company) {
+const IntelligencePage = lazy(
+  () => import('./pages/IntelligencePage'),
+)
+
+
+function AuthenticatedApplication() {
+  const {
+    contextError,
+    profile,
+    membership,
+    company,
+  } = useAuth()
+
+  if (
+    contextError ||
+    !profile ||
+    !membership ||
+    !company
+  ) {
     return <AccountContextErrorPage />
   }
 
   return <AppLayout />
 }
+
 
 export default function App() {
   return (
@@ -41,6 +69,7 @@ export default function App() {
         }
       />
 
+
       <Route
         element={
           <ProtectedRoute>
@@ -48,16 +77,27 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
+        <Route
+          index
+          element={<DashboardPage />}
+        />
+
 
         <Route
           path="clientes"
           element={
-            <RoleRoute allowedRoles={['ADMIN', 'VENDEDOR', 'ANALISTA']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'VENDEDOR',
+                'ANALISTA',
+              ]}
+            >
               <ClientsPage />
             </RoleRoute>
           }
         />
+
 
         <Route
           path="productos"
@@ -76,19 +116,33 @@ export default function App() {
           }
         />
 
+
         <Route
           path="ventas"
           element={
-            <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'VENDEDOR']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'VENDEDOR',
+              ]}
+            >
               <SalesPage />
             </RoleRoute>
           }
         />
 
+
         <Route
           path="inventario"
           element={
-            <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'ALMACEN',
+              ]}
+            >
               <InventoryPage />
             </RoleRoute>
           }
@@ -99,46 +153,95 @@ export default function App() {
           path="proveedores"
           element={
             <RoleRoute
-              allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA']}
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'ALMACEN',
+                'ANALISTA',
+              ]}
             >
               <SuppliersPage />
             </RoleRoute>
           }
         />
 
+
         <Route
           path="compras"
           element={
             <RoleRoute
-              allowedRoles={['ADMIN', 'GERENTE', 'ALMACEN', 'ANALISTA']}
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'ALMACEN',
+                'ANALISTA',
+              ]}
             >
               <PurchasesPage />
             </RoleRoute>
           }
         />
 
+
         <Route
           path="cargas"
           element={
-            <RoleRoute allowedRoles={['ADMIN', 'ANALISTA']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'ANALISTA',
+              ]}
+            >
               <ImportsPage />
             </RoleRoute>
           }
         />
 
+
         <Route
           path="reportes"
           element={
-            <RoleRoute allowedRoles={['ADMIN', 'GERENTE', 'ANALISTA']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'ANALISTA',
+              ]}
+            >
               <ReportsPage />
             </RoleRoute>
           }
         />
 
+
+        <Route
+          path="inteligencia"
+          element={
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+                'GERENTE',
+                'ANALISTA',
+              ]}
+            >
+              <Suspense
+                fallback={<LoadingScreen />}
+              >
+                <IntelligencePage />
+              </Suspense>
+            </RoleRoute>
+          }
+        />
+
+
         <Route
           path="usuarios"
           element={
-            <RoleRoute allowedRoles={['ADMIN']}>
+            <RoleRoute
+              allowedRoles={[
+                'ADMIN',
+              ]}
+            >
               <PlaceholderPage
                 title="Usuarios y roles"
                 description="Administración de miembros y permisos."
@@ -148,11 +251,38 @@ export default function App() {
           }
         />
 
-        <Route path="sin-acceso" element={<AccessDeniedPage />} />
-        <Route path="inicio" element={<Navigate to="/" replace />} />
+
+        <Route
+          path="sin-acceso"
+          element={<AccessDeniedPage />}
+        />
+
+        <Route
+          path="inicio"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
+        <Route
+          path="dashboard"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
       </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
+
+      <Route
+        path="*"
+        element={<NotFoundPage />}
+      />
     </Routes>
   )
 }
