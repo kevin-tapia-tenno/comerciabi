@@ -13,6 +13,7 @@ import {
   type AIInsightType,
 } from '../lib/ai-service'
 import { ApiClientError } from '../lib/api-client'
+import { SalesForecastSection } from '../components/ai/SalesForecastSection'
 
 import '../styles/intelligence.css'
 
@@ -1026,6 +1027,20 @@ export default function IntelligencePage() {
           </article>
         </section>
       ) : null}
+
+
+      <SalesForecastSection
+        salesForecast={
+          dashboard
+            ?.sales_forecast
+            ?? []
+        }
+        currency={currency}
+        loading={
+          loading &&
+          !dashboard
+        }
+      />
 
 
       <section className="ai-panel ai-insights-section">
