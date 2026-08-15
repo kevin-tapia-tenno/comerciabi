@@ -15,6 +15,7 @@ import {
 import { ApiClientError } from '../lib/api-client'
 import { SalesForecastSection } from '../components/ai/SalesForecastSection'
 import { DemandForecastSection } from '../components/ai/DemandForecastSection'
+import { InventoryRecommendationsSection } from '../components/ai/InventoryRecommendationsSection'
 
 import '../styles/intelligence.css'
 
@@ -1053,6 +1054,19 @@ export default function IntelligencePage() {
         demandForecast={
           dashboard
             ?.demand_forecast
+            ?? []
+        }
+        loading={
+          loading &&
+          !dashboard
+        }
+      />
+
+
+      <InventoryRecommendationsSection
+        recommendations={
+          dashboard
+            ?.inventory_recommendations
             ?? []
         }
         loading={
