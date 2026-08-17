@@ -17,18 +17,85 @@ import { useAuth } from './hooks/useAuth'
 import { AppLayout } from './layouts/AppLayout'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AccountContextErrorPage } from './pages/AccountContextErrorPage'
-import { ClientsPage } from './pages/ClientsPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { InventoryPage } from './pages/InventoryPage'
-import ImportsPage from './pages/ImportsPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
-import { ProductsPage } from './pages/ProductsPage'
-import { ReportsPage } from './pages/ReportsPage'
-import { PurchasesPage } from './pages/PurchasesPage'
-import { SuppliersPage } from './pages/SuppliersPage'
-import { SalesPage } from './pages/SalesPage'
+
+
+const ClientsPage = lazy(
+  () =>
+    import('./pages/ClientsPage').then(
+      ({ ClientsPage }) => ({
+        default: ClientsPage,
+      }),
+    ),
+)
+
+
+const ProductsPage = lazy(
+  () =>
+    import('./pages/ProductsPage').then(
+      ({ ProductsPage }) => ({
+        default: ProductsPage,
+      }),
+    ),
+)
+
+
+const SalesPage = lazy(
+  () =>
+    import('./pages/SalesPage').then(
+      ({ SalesPage }) => ({
+        default: SalesPage,
+      }),
+    ),
+)
+
+
+const InventoryPage = lazy(
+  () =>
+    import('./pages/InventoryPage').then(
+      ({ InventoryPage }) => ({
+        default: InventoryPage,
+      }),
+    ),
+)
+
+
+const SuppliersPage = lazy(
+  () =>
+    import('./pages/SuppliersPage').then(
+      ({ SuppliersPage }) => ({
+        default: SuppliersPage,
+      }),
+    ),
+)
+
+
+const PurchasesPage = lazy(
+  () =>
+    import('./pages/PurchasesPage').then(
+      ({ PurchasesPage }) => ({
+        default: PurchasesPage,
+      }),
+    ),
+)
+
+
+const ImportsPage = lazy(
+  () => import('./pages/ImportsPage'),
+)
+
+
+const ReportsPage = lazy(
+  () =>
+    import('./pages/ReportsPage').then(
+      ({ ReportsPage }) => ({
+        default: ReportsPage,
+      }),
+    ),
+)
 
 
 const IntelligencePage = lazy(
@@ -93,7 +160,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <ClientsPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <ClientsPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -111,7 +180,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <ProductsPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <ProductsPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -127,7 +198,9 @@ export default function App() {
                 'VENDEDOR',
               ]}
             >
-              <SalesPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <SalesPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -143,7 +216,9 @@ export default function App() {
                 'ALMACEN',
               ]}
             >
-              <InventoryPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <InventoryPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -160,7 +235,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <SuppliersPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <SuppliersPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -177,7 +254,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <PurchasesPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <PurchasesPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -192,7 +271,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <ImportsPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <ImportsPage />
+              </Suspense>
             </RoleRoute>
           }
         />
@@ -208,7 +289,9 @@ export default function App() {
                 'ANALISTA',
               ]}
             >
-              <ReportsPage />
+              <Suspense fallback={<LoadingScreen />}>
+                <ReportsPage />
+              </Suspense>
             </RoleRoute>
           }
         />
