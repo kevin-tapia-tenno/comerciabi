@@ -245,3 +245,132 @@ def get_inventory_recommendations(
             params,
         )
     )
+
+
+# ============================================================
+# IA - Dashboard consolidado en un solo round-trip
+# ============================================================
+
+
+def get_ai_dashboard_bundle(
+    connection: Connection,
+    empresa_key: int,
+) -> dict[str, Any]:
+    row = connection.execute(
+        text(
+            """
+            select jsonb_build_object(
+
+                'summary',
+                (
+                    select to_jsonb(summary_row)
+                    from (
+                        select *
+                        from analytics.vw_ai_resumen_actual
+                        where empresa_key = :empresa_key
+                        limit 1
+                    ) as summary_row
+                ),
+
+                'insights',
+                coalesce(
+                    (
+                        select jsonb_agg(
+                            to_jsonb(insight_row)
+                        )
+                        from (
+                            select *
+                            from analytics.vw_ai_insights_actual
+                            where empresa_key = :empresa_key
+                            order by orden, id
+                            limit 100
+                        ) as insight_row
+                    ),
+                    '[]'::jsonb
+                ),
+
+                'sales_forecast',
+                coalesce(
+                    (
+                        select jsonb_agg(
+                            to_jsonb(sales_row)
+                        )
+                        from (
+                            select *
+                            from analytics.vw_ai_pronostico_ventas_actual
+                            where empresa_key = :empresa_key
+                            order by producto, periodo
+                            limit 200
+                        ) as sales_row
+                    ),
+                    '[]'::jsonb
+                ),
+
+                'demand_forecast',
+                coalesce(
+                    (
+                        select jsonb_agg(
+                            to_jsonb(demand_row)
+                        )
+                        from (
+                            select *
+                            from analytics.vw_ai_pronostico_demanda_actual
+                            where empresa_key = :empresa_key
+                            order by producto, fecha_inicio
+                            limit 500
+                        ) as demand_row
+                    ),
+                    '[]'::jsonb
+                ),
+
+                'inventory_recommendations',
+                coalesce(
+                    (
+                        select jsonb_agg(
+                            to_jsonb(inventory_row)
+                        )
+                        from (
+                            select *
+                            from analytics.vw_ai_recomendacion_inventario_actual
+                            where empresa_key = :empresa_key
+                            order by
+                                case riesgo
+                                    when 'CRITICO' then 4
+                                    when 'ALTO' then 3
+                                    when 'MEDIO' then 2
+                                    when 'BAJO' then 1
+                                    else 0
+                                end desc,
+                                cantidad_sugerida desc,
+                                producto
+                            limit 200
+                        ) as inventory_row
+                    ),
+                    '[]'::jsonb
+                )
+
+            ) as dashboard
+            """
+        ),
+        {
+            "empresa_key": empresa_key,
+        },
+    ).mappings().one()
+
+
+    dashboard = row[
+        "dashboard"
+    ]
+
+
+    if not isinstance(
+        dashboard,
+        dict,
+    ):
+        raise RuntimeError(
+            "PostgreSQL no devolvi? un objeto "
+            "v?lido para el dashboard IA."
+        )
+
+
+    return dashboard

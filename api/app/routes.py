@@ -22,6 +22,7 @@ from api.app.models import (
     TenantContext,
 )
 from api.app.repository import (
+    get_ai_dashboard_bundle,
     get_demand_forecast,
     get_insights,
     get_inventory_recommendations,
@@ -330,40 +331,30 @@ def ai_dashboard(
     tenant: TenantContext = Depends(get_tenant_context),
     connection: Connection = Depends(get_db),
 ) -> AIDashboardResponse:
-    summary = get_summary(
+    dashboard = get_ai_dashboard_bundle(
         connection,
         tenant.empresa_key,
-    )
-
-    insights = get_insights(
-        connection,
-        tenant.empresa_key,
-        limit=100,
-    )
-
-    sales_forecast = get_sales_forecast(
-        connection,
-        tenant.empresa_key,
-        limit=200,
-    )
-
-    demand_forecast = get_demand_forecast(
-        connection,
-        tenant.empresa_key,
-        limit=500,
-    )
-
-    inventory_recommendations = get_inventory_recommendations(
-        connection,
-        tenant.empresa_key,
-        limit=200,
     )
 
     return AIDashboardResponse(
         tenant=tenant,
-        summary=summary,
-        insights=insights,
-        sales_forecast=sales_forecast,
-        demand_forecast=demand_forecast,
-        inventory_recommendations=inventory_recommendations,
+        summary=dashboard.get(
+            "summary"
+        ),
+        insights=dashboard.get(
+            "insights",
+            [],
+        ),
+        sales_forecast=dashboard.get(
+            "sales_forecast",
+            [],
+        ),
+        demand_forecast=dashboard.get(
+            "demand_forecast",
+            [],
+        ),
+        inventory_recommendations=dashboard.get(
+            "inventory_recommendations",
+            [],
+        ),
     )
