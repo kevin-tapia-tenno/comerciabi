@@ -501,3 +501,75 @@ La fase queda completa solamente si:
 - [ ] commit y push realizados.
 
 Después de esto, ComercioBI puede avanzar a Fase 16: automatización, QA y CI/CD.
+
+---
+
+# Cierre de Fase 15
+
+## Estado
+
+FASE 15 — Usuarios y roles: COMPLETADA
+
+## Validaciones realizadas
+
+### Base de datos y seguridad
+- Migración de usuarios, roles y membresías aplicada correctamente.
+- Funciones administrativas verificadas.
+- Trigger de protección del último ADMIN instalado y habilitado.
+- El rol `anon` no puede ejecutar funciones administrativas.
+- El rol `authenticated` dispone únicamente de los accesos previstos.
+- RLS mantiene el aislamiento por empresa.
+
+### Backend
+- API administrativa integrada con Supabase Auth.
+- `SUPABASE_SECRET_KEY` utilizada únicamente en servidor.
+- Endpoint de invitación validado.
+- `/api/v1/health` operativo.
+- `/api/v1/health/db` confirma conexión con PostgreSQL.
+
+### Frontend
+- Módulo Usuarios y roles operativo.
+- Invitación de usuarios desde la interfaz.
+- Cambio de rol.
+- Desactivación y reactivación de membresías.
+- Protección de rutas por rol.
+- Usuario ANALISTA no puede acceder directamente a `/usuarios`.
+
+### Pruebas E2E locales
+Flujo validado:
+
+ADMIN
+→ invitar usuario
+→ recibir correo
+→ aceptar invitación
+→ crear contraseña
+→ iniciar sesión
+→ validar rol
+→ cambiar rol
+→ desactivar membresía
+→ bloquear acceso
+→ reactivar membresía
+→ recuperar acceso.
+
+### Validación Vercel Preview
+Rama validada:
+
+`feat/fase-15-users`
+
+Se verificó correctamente:
+
+- Frontend desplegado.
+- FastAPI desplegado.
+- PostgreSQL accesible.
+- Supabase Auth operativo.
+- Invitaciones por correo.
+- Callback a `/aceptar-invitacion`.
+- Creación de contraseña.
+- Inicio de sesión del nuevo usuario.
+- Aplicación del rol ANALISTA.
+- Bloqueo de acceso directo a `/usuarios`.
+- Inteligencia IA de Fase 14 sin regresiones.
+
+## Resultado
+
+La Fase 15 queda cerrada y lista como base para la Fase 16.
