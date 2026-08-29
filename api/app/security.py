@@ -143,4 +143,5 @@ def get_current_user(
         user_id=user_id,
         email=claims.get("email"),
         claims=claims,
+        access_token=credentials.credentials,
     )

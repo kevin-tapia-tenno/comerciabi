@@ -24,6 +24,11 @@ export interface ApiGetOptions {
 }
 
 
+export interface ApiPostOptions {
+  signal?: AbortSignal
+}
+
+
 export class ApiClientError extends Error {
   readonly status: number
   readonly payload: unknown
@@ -231,4 +236,72 @@ export async function apiGet<T>(
   }
 
   return payload as T
+}
+
+export async function apiPost<TResponse, TBody>(
+  auth: ApiAuthContext,
+  path: string,
+  body: TBody,
+  options: ApiPostOptions = {},
+): Promise<TResponse> {
+  let response: Response
+
+  try {
+    response = await fetch(
+      buildUrl(path),
+      {
+        method: 'POST',
+
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+
+          Authorization:
+            `Bearer ${auth.accessToken}`,
+
+          'X-Empresa-Id':
+            auth.empresaId,
+        },
+
+        body: JSON.stringify(body),
+        signal: options.signal,
+      },
+    )
+  } catch (error) {
+    if (
+      error instanceof DOMException &&
+      error.name === 'AbortError'
+    ) {
+      throw error
+    }
+
+    throw new ApiClientError(
+      'No se pudo conectar con la API de ComercioBI.',
+      0,
+      error,
+    )
+  }
+
+  const payload = await readPayload(response)
+
+  if (!response.ok) {
+    throw new ApiClientError(
+      errorMessage(
+        response.status,
+        payload,
+      ),
+      response.status,
+      payload,
+    )
+  }
+
+  if (payload === null) {
+    throw new ApiClientError(
+      'La API no devolvió contenido.',
+      response.status,
+      payload,
+    )
+  }
+
+  return payload as TResponse
 }

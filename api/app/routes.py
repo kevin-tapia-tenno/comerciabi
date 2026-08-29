@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import Connection, text
 
+from api.app.admin_models import (
+    InviteCompanyUserRequest,
+    InviteCompanyUserResponse,
+)
 from api.app.ai_models import (
     AIDashboardResponse,
     AIDemandForecastResponse,
@@ -32,6 +36,12 @@ from api.app.repository import (
     get_summary,
 )
 from api.app.security import get_current_user
+from api.app.supabase_admin import (
+    delete_auth_user,
+    ensure_company_membership,
+    find_auth_user_by_email,
+    invite_auth_user,
+)
 from api.app.tenancy import get_tenant_context
 
 
@@ -103,6 +113,91 @@ def auth_me(
         nombres=profile.get("nombres") if profile else None,
         apellidos=profile.get("apellidos") if profile else None,
         memberships=memberships,
+    )
+
+
+# ============================================================
+# Administración - Usuarios y roles
+# ============================================================
+
+
+@router.post(
+    "/api/v1/admin/users/invite",
+    response_model=InviteCompanyUserResponse,
+    tags=["Admin"],
+)
+def invite_company_user(
+    payload: InviteCompanyUserRequest,
+    current_user: CurrentUser = Depends(get_current_user),
+    tenant: TenantContext = Depends(get_tenant_context),
+    settings: Settings = Depends(get_settings),
+) -> InviteCompanyUserResponse:
+    if tenant.rol != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo un administrador puede gestionar usuarios de la empresa.",
+        )
+
+    existing = find_auth_user_by_email(
+        settings,
+        payload.email,
+    )
+
+    created_by_request = False
+
+    if existing is None:
+        auth_user = invite_auth_user(
+            settings,
+            email=payload.email,
+            nombres=payload.nombres,
+            apellidos=payload.apellidos,
+        )
+        created_by_request = True
+        action = "INVITED"
+        message = (
+            "Invitación enviada y usuario asignado a la empresa correctamente."
+        )
+    elif existing.confirmed:
+        auth_user = existing
+        action = "LINKED_EXISTING"
+        message = (
+            "La cuenta ya existía en ComercioBI y fue vinculada a la empresa."
+        )
+    else:
+        auth_user = invite_auth_user(
+            settings,
+            email=payload.email,
+            nombres=payload.nombres,
+            apellidos=payload.apellidos,
+        )
+        action = "RESENT_INVITE"
+        message = (
+            "La cuenta estaba pendiente; se reenvió la invitación y se actualizó su membresía."
+        )
+
+    try:
+        membership_id = ensure_company_membership(
+            settings,
+            access_token=current_user.access_token,
+            empresa_id=tenant.empresa_id,
+            perfil_id=auth_user.user_id,
+            rol=payload.rol,
+        )
+    except Exception:
+        if created_by_request:
+            delete_auth_user(
+                settings,
+                auth_user.user_id,
+            )
+        raise
+
+    return InviteCompanyUserResponse(
+        user_id=auth_user.user_id,
+        membership_id=membership_id,
+        email=auth_user.email,
+        rol=payload.rol,
+        action=action,
+        message=message,
     )
 
 

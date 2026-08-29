@@ -20,7 +20,6 @@ import { AccountContextErrorPage } from './pages/AccountContextErrorPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
 
 
 const ClientsPage = lazy(
@@ -103,6 +102,26 @@ const IntelligencePage = lazy(
 )
 
 
+const UsersPage = lazy(
+  () =>
+    import('./pages/UsersPage').then(
+      ({ UsersPage }) => ({
+        default: UsersPage,
+      }),
+    ),
+)
+
+
+const AcceptInvitePage = lazy(
+  () =>
+    import('./pages/AcceptInvitePage').then(
+      ({ AcceptInvitePage }) => ({
+        default: AcceptInvitePage,
+      }),
+    ),
+)
+
+
 function AuthenticatedApplication() {
   const {
     contextError,
@@ -133,6 +152,16 @@ export default function App() {
           <PublicOnlyRoute>
             <LoginPage />
           </PublicOnlyRoute>
+        }
+      />
+
+
+      <Route
+        path="/aceptar-invitacion"
+        element={
+          <Suspense fallback={<LoadingScreen />}>
+            <AcceptInvitePage />
+          </Suspense>
         }
       />
 
@@ -325,11 +354,9 @@ export default function App() {
                 'ADMIN',
               ]}
             >
-              <PlaceholderPage
-                title="Usuarios y roles"
-                description="Administración de miembros y permisos."
-                phase="Ampliación de seguridad"
-              />
+              <Suspense fallback={<LoadingScreen />}>
+                <UsersPage />
+              </Suspense>
             </RoleRoute>
           }
         />

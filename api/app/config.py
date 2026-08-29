@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     supabase_jwt_audience: str = "authenticated"
     supabase_publishable_key: str | None = None
     supabase_anon_key: str | None = None
+    supabase_secret_key: str | None = None
+
+    app_public_url: str = "http://localhost:5173"
 
     api_db_host: str
     api_db_port: int = 6543
@@ -37,9 +40,9 @@ class Settings(BaseSettings):
         ]
     )
 
-    @field_validator("supabase_url")
+    @field_validator("supabase_url", "app_public_url")
     @classmethod
-    def normalize_supabase_url(cls, value: str) -> str:
+    def normalize_url(cls, value: str) -> str:
         return value.rstrip("/")
 
     @field_validator("cors_origins", mode="before")

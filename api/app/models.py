@@ -20,6 +20,7 @@ class CurrentUser(BaseModel):
     user_id: UUID
     email: str | None = None
     claims: dict[str, Any] = Field(default_factory=dict)
+    access_token: str = Field(exclude=True)
 
 
 class TenantContext(BaseModel):

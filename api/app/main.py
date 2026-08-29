@@ -14,10 +14,10 @@ from api.app.routes import router
 
 app = FastAPI(
     title="ComercioBI API",
-    version="14.14B-v1",
+    version="15.0-v1",
     description=(
-        "Serving API para pronósticos, recomendaciones e insights "
-        "multiempresa de ComercioBI."
+        "API multiempresa de ComercioBI para analítica, IA y "
+        "operaciones administrativas seguras."
     ),
     docs_url="/api/docs",
     redoc_url="/api/redoc",
@@ -58,7 +58,7 @@ try:
             CORSMiddleware,
             allow_origins=settings.cors_origins,
             allow_credentials=True,
-            allow_methods=["GET", "OPTIONS"],
+            allow_methods=["GET", "POST", "OPTIONS"],
             allow_headers=[
                 "Authorization",
                 "Content-Type",
