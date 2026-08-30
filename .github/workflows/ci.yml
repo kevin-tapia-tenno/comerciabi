@@ -1,4 +1,4 @@
-name: ComercioBI CI
+﻿name: ComercioBI CI
 
 on:
   push:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   frontend:
-    name: Frontend - lint & build
+    name: Frontend - lint, build & audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -45,6 +45,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+
       - name: Lint
         run: npm run lint
 
@@ -52,7 +55,7 @@ jobs:
         run: npm run build
 
   backend:
-    name: Backend - pytest
+    name: Backend - pytest & audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -93,5 +96,49 @@ jobs:
       - name: Validate installed dependencies
         run: python -m pip check
 
+      - name: Install pip-audit
+        run: python -m pip install pip-audit==2.10.1
+
+      - name: Audit backend dependencies
+        run: python -m pip_audit
+
       - name: Run API tests
         run: python -m pytest -q
+
+  secrets:
+    name: Security - secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Scan tracked files for obvious secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Scanning Git-tracked project files..."
+
+          MATCHES="$(
+            git grep -nEI \
+              '(sb_secret_[A-Za-z0-9_-]{25,}|SUPABASE_SERVICE_ROLE_KEY[[:space:]]*=[[:space:]]*[^[:space:]#]{20,}|-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----)' \
+              -- \
+              ':!*.example' \
+              ':!**/*.example' \
+              ':!docs/**' \
+              ':!node_modules/**' \
+              ':!api/.venv/**' \
+              ':!etl/.venv/**' \
+              ':!.github/workflows/ci.yml' \
+              || true
+          )"
+
+          if [ -n "$MATCHES" ]; then
+            echo "::error::Possible committed secret detected."
+            echo "$MATCHES"
+            exit 1
+          fi
+
+          echo "No obvious tracked secrets detected."
