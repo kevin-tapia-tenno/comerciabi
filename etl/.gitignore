@@ -4,10 +4,8 @@
 # Credenciales locales
 .env
 
-# Salidas del ETL
-output/*.csv
-output/*.xlsx
-output/*.parquet
+# Salidas generadas por el ETL y la capa de IA
+output/
 
 # Python
 __pycache__/

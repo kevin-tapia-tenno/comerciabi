@@ -1,0 +1,73 @@
+.users-metric-grid {
+  margin-bottom: 8px;
+}
+
+.users-toolbar {
+  grid-template-columns: minmax(260px, 1.5fr) repeat(2, minmax(170px, 0.65fr));
+}
+
+.users-table {
+  min-width: 1080px;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.role-badge-admin {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.role-badge-gerente {
+  background: #eef4ff;
+  color: #3538cd;
+}
+
+.role-badge-analista {
+  background: #f4f3ff;
+  color: #5925dc;
+}
+
+.role-badge-vendedor {
+  background: #ecfdf3;
+  color: #067647;
+}
+
+.role-badge-almacen {
+  background: #fff7e6;
+  color: #b54708;
+}
+
+.form-help {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .users-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .users-toolbar .search-control {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .users-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .users-toolbar .search-control {
+    grid-column: auto;
+  }
+}
